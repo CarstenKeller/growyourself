@@ -29,6 +29,8 @@ export interface Habit {
   seed: number;
   /** ISO timestamp. */
   createdAt: string;
+  /** Optional first if-then plan from the onboarding (Plan.md Phase 3). */
+  firstIntention?: { if: string; then: string };
   /** Set when the habit is archived: 'grown' after completion, 'dormant' after a deliberate stop. */
   ended?: { day: DayKey; reason: 'grown' | 'dormant'; at: string };
 }

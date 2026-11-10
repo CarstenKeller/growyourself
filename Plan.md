@@ -100,9 +100,9 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 - **Abnahme:** Export → Löschen → Import ergibt identischen `TreeState`.
 
 ### Phase 3 – Gewohnheit anlegen (Onboarding)
-- [ ] Typ wählen, Tageskriterium, Ausgleichshandlung, optional erster Wenn-dann-Plan
-- [ ] Bei `verzicht` mit Suchtbezug (Rauchen, Alkohol …): Hinweis auf professionelle Hilfe (z. B. BZgA-Rauchfrei-Telefon – Nummer vor Release prüfen)
-- [ ] Sperre: nur eine aktive Gewohnheit
+- [x] Typ wählen, Tageskriterium, Ausgleichshandlung, optional erster Wenn-dann-Plan
+- [x] Bei `verzicht` mit Suchtbezug (Rauchen, Alkohol …): Hinweis auf professionelle Hilfe (z. B. BZgA-Rauchfrei-Telefon – Nummer vor Release prüfen) – vorerst **ohne** Telefonnummer, siehe Offene Fragen 17
+- [x] Sperre: nur eine aktive Gewohnheit
 - **Abnahme:** Durchlauf in < 2 Minuten.
 
 ### Phase 4 – Check-in, Reflexion, Morgenansicht
@@ -161,6 +161,8 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 14. **SRBAI:** Skala (1–7) und Schwelle (5) in `params.ts` sind **Platzhalter**, nicht aus der Quelle geprüft. Gewertet wird die jüngste Antwort (Mittelwert der Items). Vor Phase 7 klären.
 15. ~~Sprache?~~ → **Deutsch und Englisch** (D-06). Grundsatz: Designvorgaben aus dem Repo `context-plus-skills` gehen den Vorgaben dieser Dateien vor (2026-11-10).
 16. ~~Startblatt~~ → („Checkin startet mit dem ersten Blatt für den ersten wichtigen Schritt mit der Nutzung der App aktiv zu werden“): umgesetzt als 1 Blatt beim Anlegen der Gewohnheit, das zum Mindestwert 42 zählt und nie fällt (auch nicht, wenn die erste Woche unausgeglichen endet). Bestätigt 2026-11-10.
+17. **Hilfe-Hinweis bei `verzicht`:** Wird bei *jeder* Verzicht-Gewohnheit gezeigt, mit bedingter Formulierung („Wenn es um Rauchen, Alkohol oder andere Suchtmittel geht …“) – keine Erkennung über Stichwörter (*Interpretation* von „mit Suchtbezug“). Er nennt Hausarztpraxis und Suchtberatungsstellen, aber noch **keine Telefonnummer**: Nummer und Träger (BZgA bzw. Nachfolgeeinrichtung) vor Release aus offizieller Quelle prüfen, dazu eine englische Entsprechung festlegen.
+18. **Darstellung Hell/Dunkel/System (D-07):** Laut Register Pflicht für jede App; derzeit folgt die App nur dem System. Auswahl kommt spätestens in Phase 9 (Dark Mode) – oder früher, wenn gewünscht.
 
 ## 6. Fortschritt
 _(Claude Code trägt hier nach jeder Phase eine kurze Notiz ein.)_
@@ -169,3 +171,5 @@ _(Claude Code trägt hier nach jeder Phase eine kurze Notiz ein.)_
 - **2026-11-10 – Phase 1 abgeschlossen:** Regel-Engine `computeTreeState(habit, records, now)` als reine Funktion; Kalender mit Tagesgrenze, ISO-Wochen, Sommerzeit-Tests (Europe/Berlin). 50 Tests, `rules.ts` 100 % Zweig-/Zeilenabdeckung (in `vitest.config.ts` als Schwelle erzwungen). Lücken im Regelwerk als Annahmen A-1–A-3 u. a. unter „Offene Fragen“ 7–15.
 - **2026-11-10 – Phase 2 abgeschlossen:** IndexedDB-Schema v1 (`habits`, `days`, `compensations`, `reflections`, `srbai`, `meta`) mit Migrationsliste; Export/Import als JSON mit Format-Kennung, Schemaversion, Validierung (Typen, Datumsformat, Dubletten, Verweise, max. eine aktive Gewohnheit) und Import in einer einzigen Transaktion. Abnahmetest „Export → Löschen → Import ergibt identischen TreeState“ grün (mit `fake-indexeddb`, Dev-Abhängigkeit nur für Tests). Im echten Browser noch nicht geprüft – das folgt mit der UI.
 - **2026-11-10 – Regeländerungen nach Antworten** (Offene Fragen 7–11, 15, 16): Startblatt, Wochenende Montag 00:00, nicht nachgetragene Tage zählen als verpasst, Knospen fallen nicht. Zuerst Tests angepasst (26 rot), dann Regeln; 65 Regel-/Kalendertests grün, `rules.ts` 100 % Zweigabdeckung. UI-Texte zweisprachig (`src/ui/texts.ts`, Sprache aus Browser-Einstellung, Standard Deutsch).
+- **2026-11-10 – GitHub Pages aktiv:** https://carstenkeller.github.io/growyourself/ – Deploy grün, von außen geprüft (Service Worker, Manifest ohne Installierbarkeits-Fehler, keine externen Requests). Automatischer Installations-Hinweis des Browsers unterdrückt (Design A-03).
+- **2026-11-10 – Phase 3 umgesetzt:** Ein Formular (Typ, Name, Tageskriterium bzw. Zielmenge + Einheit, Ausgleich, optionaler Wenn-dann-Plan), Fehlermeldungen je Feld, Hilfe-Hinweis bei Verzicht, Sperre „nur eine aktive Gewohnheit“ atomar in IndexedDB (`startHabit`). `Habit.firstIntention` neu (optional, Schema v1 bleibt, da noch keine Nutzerdaten existierten). Geprüft per Playwright: Handy (Pixel 7, iPhone 13) und Desktop, hell/dunkel, Deutsch/Englisch, nur Tastatur, Neuladen. **Abnahme „< 2 Minuten“ nicht gemessen:** Ein automatisierter Durchlauf sagt über Menschen nichts aus; Pflicht sind 1 Auswahl + 3 kurze Texte. Bitte auf dem Handy selbst testen.

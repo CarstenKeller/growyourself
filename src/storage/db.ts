@@ -57,6 +57,22 @@ export function listHabits(db: Db): Promise<Habit[]> {
   return db.getAll('habits');
 }
 
+/**
+ * Stores a new habit only if no other habit is active (CLAUDE.md principle 1).
+ * Check and write happen in one transaction. Returns false if blocked.
+ */
+export async function startHabit(db: Db, habit: Habit): Promise<boolean> {
+  const tx = db.transaction('habits', 'readwrite');
+  const all = await tx.store.getAll();
+  if (all.some((h) => !h.ended)) {
+    await tx.done;
+    return false;
+  }
+  await tx.store.add(habit);
+  await tx.done;
+  return true;
+}
+
 /** The one active habit (not ended), if any (CLAUDE.md principle 1). */
 export async function getActiveHabit(db: Db): Promise<Habit | undefined> {
   return (await listHabits(db)).find((h) => !h.ended);

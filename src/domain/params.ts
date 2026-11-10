@@ -43,6 +43,9 @@ export const PARAMS = {
   SRBAI_SCALE_MAX: 7,
   SRBAI_THRESHOLD: 5,
 
+  /** Maximum length of user-entered texts (title, criterion, compensation, if-then plan). */
+  TEXT_MAX_LENGTH: 120,
+
   /** Visible vitality per status level (healthy, slowed, stagnating, wilting). Only wilting lowers it (Plan.md 2.4). */
   VITALITY_BY_LEVEL: [1, 1, 1, 0.5] as const,
 } as const;

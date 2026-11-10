@@ -71,6 +71,8 @@ const checks: { [K in keyof ExportData]: (r: Obj) => boolean } = {
     isDayKey(r.startDay) &&
     isNum(r.seed) &&
     isStr(r.createdAt) &&
+    (r.firstIntention === undefined ||
+      (isObj(r.firstIntention) && isStr(r.firstIntention.if) && isStr(r.firstIntention.then))) &&
     (r.ended === undefined ||
       (isObj(r.ended) &&
         isDayKey(r.ended.day) &&

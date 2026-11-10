@@ -1,21 +1,128 @@
+/* Colors as tokens; light and dark follow the system for now (choice per D-07 follows, see Plan.md). */
 :root {
   --bg: #f6f4ec;
+  --surface: #ffffff;
   --fg: #1f2a1f;
-  --muted: #4d5a4d;
+  --muted: #4a574a;
+  --border: #c9cfc3;
   --accent: #2f6b3a;
+  --accent-fg: #ffffff;
+  --accent-soft: #e3efe0;
+  --error: #a3261b;
+  --notice: #fff6dc;
+  --notice-border: #e0c36a;
+  --focus: #1d5fbf;
   color-scheme: light dark;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.5;
 }
 @media (prefers-color-scheme: dark) {
-  :root { --bg: #141a14; --fg: #e8eee6; --muted: #b3bfb1; --accent: #8bc58f; }
+  :root {
+    --bg: #121812;
+    --surface: #1b231b;
+    --fg: #e8eee6;
+    --muted: #b6c2b4;
+    --border: #3b473a;
+    --accent: #8bc58f;
+    --accent-fg: #0f1a10;
+    --accent-soft: #233523;
+    --error: #ff9b8f;
+    --notice: #2d2716;
+    --notice-border: #7d6a2c;
+    --focus: #8ab4ff;
+  }
 }
 * { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--fg); }
 main {
-  max-width: 40rem;
+  max-width: 36rem;
   margin: 0 auto;
-  padding: max(1.5rem, env(safe-area-inset-top)) 1rem max(1.5rem, env(safe-area-inset-bottom));
+  padding: max(1.25rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(2rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
 }
-h1 { color: var(--accent); font-size: 1.75rem; margin: 0 0 0.5rem; }
-p { color: var(--muted); }
+h1 { color: var(--accent); font-size: 1.6rem; line-height: 1.2; margin: 0 0 0.25rem; }
+p { margin: 0.25rem 0; }
+.lead { color: var(--muted); margin-bottom: 1rem; }
+.hint { color: var(--muted); font-size: 0.9rem; }
+.center { text-align: center; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+form { display: grid; gap: 1rem; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+legend { font-weight: 600; margin-bottom: 0.5rem; padding: 0; }
+.group { border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem 1rem; background: var(--surface); }
+.group legend { padding: 0 0.25rem; }
+.group .field + .field { margin-top: 0.75rem; }
+
+.field { display: grid; gap: 0.25rem; }
+.field label { font-weight: 600; }
+input[type='text'] {
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  min-height: 48px;
+  width: 100%;
+}
+input[aria-invalid='true'] { border-color: var(--error); border-width: 2px; }
+.field-error, .form-error { color: var(--error); font-size: 0.9rem; min-height: 0; }
+.field-error:empty, .form-error:empty { display: none; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+[hidden] { display: none !important; }
+
+.choices { display: grid; gap: 0.5rem; }
+.choice { position: relative; }
+.choice input { position: absolute; opacity: 0; inset: 0; margin: 0; }
+.choice label {
+  display: grid;
+  gap: 0.1rem;
+  min-height: 48px;
+  padding: 0.7rem 0.9rem 0.7rem 2.6rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+  position: relative;
+}
+.choice label::before {
+  content: '';
+  position: absolute;
+  left: 0.9rem;
+  top: 0.95rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  border: 2px solid var(--muted);
+}
+.choice label span { color: var(--muted); font-size: 0.9rem; }
+.choice input:checked + label { border: 2px solid var(--accent); background: var(--accent-soft); }
+.choice input:checked + label::before { border-color: var(--accent); background: radial-gradient(var(--accent) 45%, transparent 50%); }
+.choice input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.notice { background: var(--notice); border: 1px solid var(--notice-border); border-radius: 12px; padding: 0.75rem 1rem; font-size: 0.95rem; }
+
+button.primary {
+  font: inherit;
+  font-weight: 600;
+  min-height: 48px;
+  padding: 0.75rem 1.25rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-fg);
+  cursor: pointer;
+}
+button.primary:disabled { opacity: 0.6; cursor: progress; }
+
+.counter { font-size: 1.1rem; font-weight: 600; }
+.facts { display: grid; gap: 0.15rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; margin: 1rem 0; }
+.facts dt { font-weight: 600; color: var(--muted); font-size: 0.9rem; }
+.facts dd { margin: 0 0 0.5rem; }
+
+@media (min-width: 48rem) {
+  main { padding-top: 3rem; }
+  h1 { font-size: 2rem; }
+}

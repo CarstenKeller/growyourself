@@ -34,6 +34,13 @@ ist das zentrale Bild; Texte ermutigen, ohne Wirksamkeit zu versprechen.
 - **Quelle:** wörtliche Vorgabe: "Deutsch und Englisch. Alle Designvorgaben aus dem Repo schlagen die Vorgaben der angefügten Dateien.", 2026-11-10
 - **Status:** ersetzt durch D-06 (2026-11-10)
 
+### A-03: Installierbar, aber ohne automatischen Installations-Hinweis
+- **Entscheidung:** Die App bleibt eine installierbare PWA (Manifest, Service Worker, offlinefähig). Den automatischen Hinweis „App installieren“ des Browsers (Android/Chrome) unterdrückt sie; installieren geht weiter über das Browser-Menü bzw. auf iOS über „Zum Home-Bildschirm“.
+- **Umsetzung (Web):** `beforeinstallprompt` mit `preventDefault()` abfangen, keinen eigenen Installieren-Button anbieten.
+- **Abweichung von:** –
+- **Quelle:** wörtliche Vorgabe: "Variante 1" (installierbar lassen, ohne aufdrängenden Hinweis), 2026-11-10
+- **Status:** bestätigt (2026-11-10)
+
 ## Offene Designfragen dieser App
 
 - [x] ~~Englisch zusätzlich (D-06) oder nur Deutsch (A-02)?~~ → D-06 (2026-11-10)
