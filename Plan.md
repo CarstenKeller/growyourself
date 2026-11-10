@@ -151,16 +151,16 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 
 **Lücken im Regelwerk aus Phase 1** (Antworten 2026-11-10, jeweils per Szenario-Test abgesichert):
 
-7. ~~Nie nachgetragener Check-in neutral?~~ → **Nein:** zählt wie verpasst (abgeleitet aus „Urlaub gibt es nicht“, siehe 11; Regel 2.3.5). *Interpretation von Claude* – bitte bestätigen.
-8. ~~Sonntag nachtragen?~~ → „Mit Montag 00:01 Uhr ist die alte Woche um.“ Umgesetzt als `WEEK_CUTOFF` Montag 00:00: Ab dann ist weder Nachtrag noch Ausgleich für die alte Woche möglich, obwohl der *Tag* bis 03:00 noch Sonntag ist. Folge zusammen mit 7: Ein vergessener Sonntags-Check-in macht die Woche unausgeglichen. (00:00 statt 00:01 ist *Interpretation*: Sonntag 23:59 gehört noch zur alten Woche.)
+7. ~~Nie nachgetragener Check-in neutral?~~ → **Nein:** zählt wie verpasst (abgeleitet aus „Urlaub gibt es nicht“, siehe 11; Regel 2.3.5). bestätigt 2026-11-10.
+8. ~~Sonntag nachtragen?~~ → „Mit Montag 00:01 Uhr ist die alte Woche um.“ Umgesetzt als `WEEK_CUTOFF` Montag 00:00: Ab dann ist weder Nachtrag noch Ausgleich für die alte Woche möglich, obwohl der *Tag* bis 03:00 noch Sonntag ist. Folge zusammen mit 7: Ein vergessener Sonntags-Check-in macht die Woche unausgeglichen. (00:00 statt 00:01, Sonntag 23:59 gehört noch zur alten Woche – bestätigt 2026-11-10.)
 9. ~~Vorarbeiten?~~ → „Verarbeiten zählt nicht“, gelesen als **Vorarbeiten zählt nicht** (Regel 2.3.3).
-10. ~~Knospen bei unausgeglichener Woche?~~ → „Nicht Knospen, sondern verwelktes Laub fällt zu Boden.“ Knospen fallen nicht als Laub; sie öffnen sich auch nicht, sondern vergehen (*Interpretation*: Alternative wäre, dass sie als Knospen bis zur nächsten ausgeglichenen Woche bleiben).
+10. ~~Knospen bei unausgeglichener Woche?~~ → „Nicht Knospen, sondern verwelktes Laub fällt zu Boden.“ Knospen fallen nicht als Laub; sie öffnen sich auch nicht, sondern vergehen – bestätigt 2026-11-10.
 11. ~~Woche ohne Eintrag?~~ → „Urlaub gibt es nicht.“ Eine solche Woche ist unausgeglichen.
 12. **Wind:** Ausgelöst am 7. grünen Tag in Folge (erfolgreich oder ausgeglichen), weht alles Laub weg, das bis dahin liegt. Ein Tag ohne Eintrag (vor heute) unterbricht die Serie; der heutige, noch offene Tag nicht.
 13. **„Wochenwechsel an Sonntag 02:30“** (Phase-1-Test) verstanden als Nacht von Sonntag auf Montag: Montag 02:30 gehört noch zum Sonntag, die Woche ist noch offen. Zusätzlich getestet: Sonntag 02:30 gehört zum Samstag.
 14. **SRBAI:** Skala (1–7) und Schwelle (5) in `params.ts` sind **Platzhalter**, nicht aus der Quelle geprüft. Gewertet wird die jüngste Antwort (Mittelwert der Items). Vor Phase 7 klären.
 15. ~~Sprache?~~ → **Deutsch und Englisch** (D-06). Grundsatz: Designvorgaben aus dem Repo `context-plus-skills` gehen den Vorgaben dieser Dateien vor (2026-11-10).
-16. **Startblatt** („Checkin startet mit dem ersten Blatt für den ersten wichtigen Schritt mit der Nutzung der App aktiv zu werden“): umgesetzt als 1 Blatt beim Anlegen der Gewohnheit, das zum Mindestwert 42 zählt und nie fällt (auch nicht, wenn die erste Woche unausgeglichen endet). *Interpretation* – offen: Soll es stattdessen erst mit dem ersten Check-in entstehen, und soll es zu den 42 zählen?
+16. ~~Startblatt~~ → („Checkin startet mit dem ersten Blatt für den ersten wichtigen Schritt mit der Nutzung der App aktiv zu werden“): umgesetzt als 1 Blatt beim Anlegen der Gewohnheit, das zum Mindestwert 42 zählt und nie fällt (auch nicht, wenn die erste Woche unausgeglichen endet). Bestätigt 2026-11-10.
 
 ## 6. Fortschritt
 _(Claude Code trägt hier nach jeder Phase eine kurze Notiz ein.)_
