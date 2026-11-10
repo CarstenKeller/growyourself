@@ -106,37 +106,37 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 - **Abnahme:** Durchlauf in < 2 Minuten.
 
 ### Phase 4 – Check-in, Reflexion, Morgenansicht
-- [ ] Check-in-Dialog gemäß 2.7, Nachtragsfunktion
-- [ ] Ausgleichshandlung erfassen
-- [ ] Startansicht mit Vorhaben des Tages
+- [x] Check-in-Dialog gemäß 2.7, Nachtragsfunktion
+- [x] Ausgleichshandlung erfassen
+- [x] Startansicht mit Vorhaben des Tages
 - **Abnahme:** Check-in in ≤ 60 Sekunden auf dem Handy bedienbar.
 
 ### Phase 5 – Baum (SVG)
-- [ ] Deterministischer Baum aus Seed; Äste wachsen mit Blattzahl
-- [ ] Blätter, Knospen, Laub am Boden, Vitalitätsstufen
-- [ ] Blattzähler sichtbar; Textbeschreibung für Screenreader
-- [ ] Animationen: neues Blatt, fallendes Blatt, Wind (respektiert `prefers-reduced-motion`)
+- [x] Deterministischer Baum aus Seed; Äste wachsen mit Blattzahl
+- [x] Blätter, Knospen, Laub am Boden, Vitalitätsstufen
+- [x] Blattzähler sichtbar; Textbeschreibung für Screenreader
+- [x] Animationen: neues Blatt, fallendes Blatt, Wind (respektiert `prefers-reduced-motion`)
 - **Abnahme:** Visueller Zustand stimmt für alle Szenarien aus Phase 1 (Testseite mit Fixtures).
 
 ### Phase 6 – Wochenabrechnung in der UI
-- [ ] Wochenrückblick beim ersten Öffnen nach Sonntag (was ist passiert, neuer Status, Ermutigung)
-- [ ] Hinweis am Wochenende auf offene Ausgleichseinheiten
+- [x] Wochenrückblick beim ersten Öffnen nach Sonntag (was ist passiert, neuer Status, Ermutigung)
+- [x] Hinweis am Wochenende auf offene Ausgleichseinheiten
 - **Abnahme:** Rückblick erscheint genau einmal pro Woche.
 
 ### Phase 7 – Abschluss und Garten (Liste)
-- [ ] SRBAI-Abfrage ab Schwelle, Abschlussprüfung, Abschlussfeier
-- [ ] „Mein Garten“: Liste archivierter Bäume (ausgewachsen / ruhend) mit Dauer und Blattzahl
-- [ ] Bewusster Abbruch
+- [x] SRBAI-Abfrage ab Schwelle, Abschlussprüfung, Abschlussfeier – **Wortlaut nur vorläufig**, siehe Offene Fragen 14
+- [x] „Mein Garten“: Liste archivierter Bäume (ausgewachsen / ruhend) mit Dauer und Blattzahl
+- [x] Bewusster Abbruch
 - **Abnahme:** Nach Abschluss lässt sich eine neue Gewohnheit anlegen.
 
 ### Phase 8 – Erinnerungen und Auswertung
-- [ ] `.ics`-Export (Check-in-Zeit und Morgenzeit wählbar)
-- [ ] Auswertung gemäß 2.8
+- [x] `.ics`-Export (Check-in-Zeit und Morgenzeit wählbar)
+- [x] Auswertung gemäß 2.8
 - **Abnahme:** `.ics` lässt sich in Google- und Apple-Kalender importieren.
 
 ### Phase 9 – Feinschliff und Release
-- [ ] Datenschutzhinweis (alles lokal, Export als Sicherung empfehlen)
-- [ ] Barrierefreiheit prüfen, Desktop-Layout, Dark Mode
+- [x] Datenschutzhinweis (alles lokal, Export als Sicherung empfehlen)
+- [x] Barrierefreiheit prüfen, Desktop-Layout, Dark Mode
 - [ ] Selbsttest: 2 Wochen Eigennutzung, danach Parameter überprüfen
 
 ## 5. Offene Fragen (vor bzw. während der Umsetzung klären)
@@ -158,11 +158,15 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 11. ~~Woche ohne Eintrag?~~ → „Urlaub gibt es nicht.“ Eine solche Woche ist unausgeglichen.
 12. **Wind:** Ausgelöst am 7. grünen Tag in Folge (erfolgreich oder ausgeglichen), weht alles Laub weg, das bis dahin liegt. Ein Tag ohne Eintrag (vor heute) unterbricht die Serie; der heutige, noch offene Tag nicht.
 13. **„Wochenwechsel an Sonntag 02:30“** (Phase-1-Test) verstanden als Nacht von Sonntag auf Montag: Montag 02:30 gehört noch zum Sonntag, die Woche ist noch offen. Zusätzlich getestet: Sonntag 02:30 gehört zum Samstag.
-14. **SRBAI:** Skala (1–7) und Schwelle (5) in `params.ts` sind **Platzhalter**, nicht aus der Quelle geprüft. Gewertet wird die jüngste Antwort (Mittelwert der Items). Vor Phase 7 klären.
+14. **SRBAI – noch offen:** Die vier englischen Aussagen und die 7-Punkt-Zustimmungsskala sind nur über *Sekundärquellen* bestätigt (Websuche 2026-11-10). Originalartikel (Gardner u. a. 2012, DOI 10.1186/1479-5868-9-102) und die validierte deutsche Fassung SRBAI-G (Ljubic u. a. 2025, DOI 10.1007/s12662-025-01050-z) waren aus der Build-Umgebung nicht abrufbar (`pmc.ncbi.nlm.nih.gov`, `publikationen.bibliothek.kit.edu` gesperrt). Die deutschen Sätze in der App sind eine **eigene Übersetzung** und als „vorläufig“ gekennzeichnet; laut Suchergebnis hat die SRBAI-G ein Item weniger – das ist zu prüfen. Schwelle 5 (Mittelwert) ist ein gesetzter Wert, kein Forschungswert. Gewertet wird die jüngste Antwort.
 15. ~~Sprache?~~ → **Deutsch und Englisch** (D-06). Grundsatz: Designvorgaben aus dem Repo `context-plus-skills` gehen den Vorgaben dieser Dateien vor (2026-11-10).
 16. ~~Startblatt~~ → („Checkin startet mit dem ersten Blatt für den ersten wichtigen Schritt mit der Nutzung der App aktiv zu werden“): umgesetzt als 1 Blatt beim Anlegen der Gewohnheit, das zum Mindestwert 42 zählt und nie fällt (auch nicht, wenn die erste Woche unausgeglichen endet). Bestätigt 2026-11-10.
 17. **Hilfe-Hinweis bei `verzicht`:** Wird bei *jeder* Verzicht-Gewohnheit gezeigt, mit bedingter Formulierung („Wenn es um Rauchen, Alkohol oder andere Suchtmittel geht …“) – keine Erkennung über Stichwörter (*Interpretation* von „mit Suchtbezug“). Er nennt Hausarztpraxis und Suchtberatungsstellen, aber noch **keine Telefonnummer**: Nummer und Träger (BZgA bzw. Nachfolgeeinrichtung) vor Release aus offizieller Quelle prüfen, dazu eine englische Entsprechung festlegen.
-18. **Darstellung Hell/Dunkel/System (D-07):** Laut Register Pflicht für jede App; derzeit folgt die App nur dem System. Auswahl kommt spätestens in Phase 9 (Dark Mode) – oder früher, wenn gewünscht.
+18. ~~Darstellung Hell/Dunkel/System (D-07)~~ → umgesetzt (Icon „Darstellung“ in der Kopfzeile, Dialog, Wahl in `localStorage`).
+19. **Hilfe-Telefon:** Rauchfrei-Telefon des BIÖG **0800 8 31 31 31** (Mo–Do 10–22, Fr–So 10–18 Uhr), per Websuche am 2026-11-10 in mehreren Quellen übereinstimmend, u. a. BIÖG-Themendossier Rauchstopp 2025. Vor Release noch einmal auf bioeg.de / rauchfrei-info.de prüfen.
+20. **Abschluss mitten in der Woche:** Der Abschluss ist möglich, sobald die Bedingungen erfüllt sind – auch bevor die laufende Woche abgerechnet ist (deren Blätter könnten bei unausgeglichenem Ende noch fallen). Regelwerk 2.6 sagt dazu nichts. Gewollt, oder erst nach einer ausgeglichenen Wochenabrechnung?
+21. **Vorhaben-Geltung:** Das Vorhaben gilt nur für den Tag nach dem Check-in, in dem es gesetzt wurde. Fehlt ein Check-in, wird am Folgetag kein Vorhaben angezeigt. Beim nächsten Check-in ist das letzte Vorhaben aber vorausgefüllt.
+22. **Nicht umgesetzt aus Abschnitt 3:** „Lokale Benachrichtigung, solange die App geöffnet ist“ – steht in keiner Phase mit Häkchen; bewusst weggelassen (Nutzen gering, Berechtigungsdialog). Nachrüsten?
 
 ## 6. Fortschritt
 _(Claude Code trägt hier nach jeder Phase eine kurze Notiz ein.)_
@@ -173,3 +177,12 @@ _(Claude Code trägt hier nach jeder Phase eine kurze Notiz ein.)_
 - **2026-11-10 – Regeländerungen nach Antworten** (Offene Fragen 7–11, 15, 16): Startblatt, Wochenende Montag 00:00, nicht nachgetragene Tage zählen als verpasst, Knospen fallen nicht. Zuerst Tests angepasst (26 rot), dann Regeln; 65 Regel-/Kalendertests grün, `rules.ts` 100 % Zweigabdeckung. UI-Texte zweisprachig (`src/ui/texts.ts`, Sprache aus Browser-Einstellung, Standard Deutsch).
 - **2026-11-10 – GitHub Pages aktiv:** https://carstenkeller.github.io/growyourself/ – Deploy grün, von außen geprüft (Service Worker, Manifest ohne Installierbarkeits-Fehler, keine externen Requests). Automatischer Installations-Hinweis des Browsers unterdrückt (Design A-03).
 - **2026-11-10 – Phase 3 umgesetzt:** Ein Formular (Typ, Name, Tageskriterium bzw. Zielmenge + Einheit, Ausgleich, optionaler Wenn-dann-Plan), Fehlermeldungen je Feld, Hilfe-Hinweis bei Verzicht, Sperre „nur eine aktive Gewohnheit“ atomar in IndexedDB (`startHabit`). `Habit.firstIntention` neu (optional, Schema v1 bleibt, da noch keine Nutzerdaten existierten). Geprüft per Playwright: Handy (Pixel 7, iPhone 13) und Desktop, hell/dunkel, Deutsch/Englisch, nur Tastatur, Neuladen. **Abnahme „< 2 Minuten“ nicht gemessen:** Ein automatisierter Durchlauf sagt über Menschen nichts aus; Pflicht sind 1 Auswahl + 3 kurze Texte. Bitte auf dem Handy selbst testen.
+- **2026-11-10 – Phasen 4–9 umgesetzt** (Phase 9 ohne den Selbsttest, der braucht 2 Wochen Nutzung):
+  - Phase 4: Check-in nach 2.7 (Kriterium bzw. Menge, Vorhaben von gestern, Hinderungsgründe nur bei teilweise/nein, Wenn-dann für morgen), Nachtrag für bis zu 2 Tage, Ausgleich per Knopf, Vorhaben des Tages oben auf der Startseite.
+  - Phase 5: Baum als deterministisches SVG (`src/tree/tree.ts`), Struktur nach `grownTotal` (schrumpft nie), Blätter/Knospen/Laub/Welken, Text für Screenreader, Animationen für neue Blätter, fallendes Laub und Wind (nur ohne `prefers-reduced-motion`). **Testseite** `tree-test.html` mit 12 Fixtures; automatischer Test prüft, dass jede Zeichnung zum Zustand passt.
+  - Phase 6: Wochenrückblick genau einmal je abgerechneter Woche (Meta `lastReviewedWeek`), Wochenend-Hinweis auf offene Ausgleiche.
+  - Phase 7: SRBAI ab 35 Blättern wöchentlich, Abschlussfeier, „Mein Garten“, bewusster Abbruch (ruhend).
+  - Phase 8: `.ics` mit zwei täglichen Terminen (Zeiten wählbar), Auswertung nach 2.8 ab 14 Check-ins.
+  - Phase 9: Datenschutz- und Hilfetext in den Einstellungen, Export/Import in der UI, Darstellung Hell/Dunkel/System (D-07), Desktop-Layout zweispaltig. Kontraste nachgerechnet (alle Textpaare ≥ 5,5 : 1, beide Modi), Tastaturbedienung, Namen aller Bedienelemente, kein seitliches Scrollen bei 320 px und 200 % Schrift.
+  - Geprüft per Playwright mit simulierter Uhr: ganzer Ablauf über mehrere Tage und den Wochenwechsel, Abschluss bis zur neuen Gewohnheit, Export → Beenden → Import. 108 Tests grün.
+  - **Nicht geprüft:** echte Geräte (Android/iOS), Import der `.ics` in Google-/Apple-Kalender (Abnahme Phase 8), Check-in-Dauer durch Menschen (Abnahme Phase 4), Screenreader in echt.

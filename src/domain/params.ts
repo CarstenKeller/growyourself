@@ -35,13 +35,21 @@ export const PARAMS = {
 
   /**
    * SRBAI scale and threshold.
-   * UNVERIFIED: wording, scale and German translation must be checked against
-   * the source (Gardner et al. 2012) before Phase 7. Placeholder values only.
+   * Items (4) and 7-point agreement scale confirmed only via secondary sources
+   * (search 2026-11-10); original paper and German SRBAI-G not accessible from
+   * the build environment. THRESHOLD is a set value, not a research cut-off.
    */
   SRBAI_ITEM_COUNT: 4,
   SRBAI_SCALE_MIN: 1,
   SRBAI_SCALE_MAX: 7,
   SRBAI_THRESHOLD: 5,
+
+  /** Descriptive evaluation (Plan.md 2.8) from this many check-ins on. */
+  INSIGHTS_MIN_CHECKINS: 14,
+
+  /** Default reminder times for the calendar export (Plan.md 3, Phase 8), local time HH:MM. */
+  ICS_DEFAULT_CHECKIN: '21:00',
+  ICS_DEFAULT_MORNING: '07:30',
 
   /** Maximum length of user-entered texts (title, criterion, compensation, if-then plan). */
   TEXT_MAX_LENGTH: 120,

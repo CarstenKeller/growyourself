@@ -28,8 +28,8 @@ describe('UI language (D-06)', () => {
     expect(Object.keys(en).sort()).toEqual(Object.keys(de).sort());
     // Empty only where intended (no free criterion for quantity habits).
     const empty = (t: Record<string, string>) => Object.keys(t).filter((k) => t[k]?.trim() === '');
-    expect(empty(de)).toEqual(['fieldCriterionPlaceholder.quantity']);
-    expect(empty(en)).toEqual(['fieldCriterionPlaceholder.quantity']);
+    expect(empty(de)).toEqual(['fieldCriterionPlaceholder.quantity', 'statusHint.healthy']);
+    expect(empty(en)).toEqual(['fieldCriterionPlaceholder.quantity', 'statusHint.healthy']);
   });
 
   it('texts contain no numbers that belong in params.ts', () => {

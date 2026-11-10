@@ -6,6 +6,12 @@ const base = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   base,
+  build: {
+    rollupOptions: {
+      // Second page: tree fixtures for the Phase 5 acceptance check.
+      input: { main: 'index.html', fixtures: 'tree-test.html' },
+    },
+  },
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
@@ -29,6 +35,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
+        globIgnores: ['**/tree-test.html'],
+        // The fixture page is a real page, not an app route.
+        navigateFallbackDenylist: [/tree-test\.html$/],
       },
     }),
   ],
