@@ -82,8 +82,8 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 ## 4. Umsetzungsphasen
 
 ### Phase 0 – Projektgerüst
-- [ ] Vite + TS strict, ESLint, Vitest, vite-plugin-pwa
-- [ ] GitHub-Actions-Workflow für Tests + Deployment auf GitHub Pages
+- [x] Vite + TS strict, ESLint, Vitest, vite-plugin-pwa
+- [x] GitHub-Actions-Workflow für Tests + Deployment auf GitHub Pages (Deploy-Schritt wartet auf Aktivierung von Pages im Repo, siehe Fortschritt)
 - **Abnahme:** `npm run build` und `npm run test` grün; leere PWA installierbar.
 
 ### Phase 1 – Domänenmodell und Regel-Engine
@@ -93,8 +93,8 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 - **Abnahme:** 100 % Zweigabdeckung in `rules.ts`.
 
 ### Phase 2 – Persistenz
-- [ ] IndexedDB-Schema v1 mit `idb`, Migrationsgerüst
-- [ ] Export/Import als JSON inkl. Schemaversion und Validierung
+- [x] IndexedDB-Schema v1 mit `idb`, Migrationsgerüst
+- [x] Export/Import als JSON inkl. Schemaversion und Validierung
 - **Abnahme:** Export → Löschen → Import ergibt identischen `TreeState`.
 
 ### Phase 3 – Gewohnheit anlegen (Onboarding)
@@ -160,4 +160,6 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 ## 6. Fortschritt
 _(Claude Code trägt hier nach jeder Phase eine kurze Notiz ein.)_
 
+- **2026-11-10 – Phase 0 abgeschlossen:** Build, Lint und Tests in CI grün. Leere PWA lokal in Chromium geprüft: Service Worker aktiv, Manifest ohne Installierbarkeits-Fehler, keine externen Requests. **Offen:** GitHub Pages ist im Repo nicht aktiviert (Deploy-Job: 404 „Ensure GitHub Pages has been enabled“) – einmalig *Settings → Pages → Source: GitHub Actions*. Deployt wird nur der Standard-Branch. Icon ist ein Platzhalter. `npm audit`: 3 mittlere Meldungen in Build-Werkzeugen (workbox-build → glob/minimatch/deepmerge), nicht im ausgelieferten Code; Fix nur per Downgrade von vite-plugin-pwa, daher bewusst belassen.
 - **2026-11-10 – Phase 1 abgeschlossen:** Regel-Engine `computeTreeState(habit, records, now)` als reine Funktion; Kalender mit Tagesgrenze, ISO-Wochen, Sommerzeit-Tests (Europe/Berlin). 50 Tests, `rules.ts` 100 % Zweig-/Zeilenabdeckung (in `vitest.config.ts` als Schwelle erzwungen). Lücken im Regelwerk als Annahmen A-1–A-3 u. a. unter „Offene Fragen“ 7–15.
+- **2026-11-10 – Phase 2 abgeschlossen:** IndexedDB-Schema v1 (`habits`, `days`, `compensations`, `reflections`, `srbai`, `meta`) mit Migrationsliste; Export/Import als JSON mit Format-Kennung, Schemaversion, Validierung (Typen, Datumsformat, Dubletten, Verweise, max. eine aktive Gewohnheit) und Import in einer einzigen Transaktion. Abnahmetest „Export → Löschen → Import ergibt identischen TreeState“ grün (mit `fake-indexeddb`, Dev-Abhängigkeit nur für Tests). Im echten Browser noch nicht geprüft – das folgt mit der UI.
