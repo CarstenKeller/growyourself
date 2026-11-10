@@ -9,11 +9,20 @@ import { canRecord, computeTreeState, isSuccess } from '../src/domain/rules';
 import { MON, Records, at, habit, week } from './helpers';
 
 const state = (r: Records, now: Date, h = habit()) => computeTreeState(h, r, now);
+/** Leaf granted for starting the habit (answer 2026-11-10). */
+const START = PARAMS.START_LEAVES;
 
 describe('day level (Plan.md 2.3)', () => {
-  it('perfect week: 7 leaves, healthy, balanced', () => {
+  it('starting the habit grows the first leaf', () => {
+    const s = state(new Records(), at(MON, 10));
+    expect(START).toBe(1);
+    expect(s.leaves).toBe(START);
+    expect(s.grownTotal).toBe(START);
+  });
+
+  it('perfect week: start leaf + 7 leaves, healthy, balanced', () => {
     const s = state(new Records().days_(MON, 7), at(week(1), 10));
-    expect(s.leaves).toBe(7);
+    expect(s.leaves).toBe(START + 7);
     expect(s.status).toBe('healthy');
     expect(s.litter).toBe(0);
     expect(s.weeks[0]).toMatchObject({ settled: true, balanced: true, grown: 7, fallen: 0 });
@@ -22,14 +31,14 @@ describe('day level (Plan.md 2.3)', () => {
 
   it('leaves of the running week are on the tree before settlement', () => {
     const s = state(new Records().days_(MON, 3), at(addDays(MON, 2), 22));
-    expect(s.leaves).toBe(3);
+    expect(s.leaves).toBe(START + 3);
     expect(s.weeks[0]).toMatchObject({ settled: false, balanced: false });
     expect(s.streak).toBe(3);
   });
 
   it('missed day opens one compensation unit', () => {
     const s = state(new Records().days_(MON, 2).day(addDays(MON, 2), 'no'), at(addDays(MON, 2), 22));
-    expect(s.leaves).toBe(2);
+    expect(s.leaves).toBe(START + 2);
     expect(s.openUnits).toBe(1);
     expect(s.days[2]).toEqual({ day: addDays(MON, 2), status: 'missed' });
     expect(s.streak).toBe(0);
@@ -38,7 +47,7 @@ describe('day level (Plan.md 2.3)', () => {
   it('1 missed day with compensation in the same week becomes a leaf', () => {
     const r = new Records().days_(MON, 7).day(addDays(MON, 2), 'no').comp(addDays(MON, 4));
     const s = state(r, at(week(1), 10));
-    expect(s.leaves).toBe(7);
+    expect(s.leaves).toBe(START + 7);
     expect(s.openUnits).toBe(0);
     expect(s.days[2]?.status).toBe('compensated');
     expect(s.weeks[0]).toMatchObject({ balanced: true, successDays: 6, compensatedDays: 1, missedDays: 0 });
@@ -46,14 +55,14 @@ describe('day level (Plan.md 2.3)', () => {
 
   it('compensation on the same day as the missed day counts', () => {
     const r = new Records().day(MON, 'no').comp(MON);
-    expect(state(r, at(MON, 22)).leaves).toBe(1);
+    expect(state(r, at(MON, 22)).leaves).toBe(START + 1);
   });
 
-  it('assumption A-2: compensation done before the missed day does not count; surplus has no credit', () => {
+  it('working ahead does not count (confirmed 2026-11-10); surplus units have no credit', () => {
     const r = new Records().comp(MON).comp(MON).day(MON, 'yes').day(addDays(MON, 1), 'no');
     const s = state(r, at(addDays(MON, 1), 22));
     expect(s.openUnits).toBe(1);
-    expect(s.leaves).toBe(1);
+    expect(s.leaves).toBe(START + 1);
   });
 
   it('compensation in the following week does not cover the old week', () => {
@@ -64,7 +73,7 @@ describe('day level (Plan.md 2.3)', () => {
 
   it('partial counts as missed (Plan.md 5, question 4)', () => {
     const s = state(new Records().day(MON, 'partial'), at(MON, 22));
-    expect(s.leaves).toBe(0);
+    expect(s.leaves).toBe(START);
     expect(s.openUnits).toBe(1);
   });
 
@@ -82,7 +91,7 @@ describe('day level (Plan.md 2.3)', () => {
 
   it('the latest entry for a day wins', () => {
     const s = state(new Records().day(MON, 'no').day(MON, 'yes'), at(MON, 22));
-    expect(s.leaves).toBe(1);
+    expect(s.leaves).toBe(START + 1);
     expect(s.openUnits).toBe(0);
   });
 });
@@ -92,9 +101,9 @@ describe('forgotten check-ins (Plan.md 2.3.4)', () => {
     const r = new Records().day(MON, 'yes');
     const before = state(r, at(addDays(MON, 2), 9));
     expect(before.days.map((d) => d.status)).toEqual(['success', 'pending', 'pending']);
-    expect(before.leaves).toBe(1);
+    expect(before.leaves).toBe(START + 1);
     r.day(addDays(MON, 1), 'yes');
-    expect(state(r, at(addDays(MON, 2), 9)).leaves).toBe(2);
+    expect(state(r, at(addDays(MON, 2), 9)).leaves).toBe(START + 2);
   });
 
   it('today without check-in does not break the streak', () => {
@@ -107,24 +116,43 @@ describe('forgotten check-ins (Plan.md 2.3.4)', () => {
     expect(s.streak).toBe(1);
   });
 
-  it('assumption A-1: a check-in never entered is neutral — no leaf lost, no unit, no falling leaves', () => {
-    const r = new Records().days_(MON, 3).days_(addDays(MON, 4), 3); // Thursday forgotten
+  it('a check-in not backfilled in time counts as missed and opens a unit ("Urlaub gibt es nicht")', () => {
+    const r = new Records().days_(MON, 3).days_(addDays(MON, 4), 3); // Thursday never entered
     const s = state(r, at(week(1), 10));
     expect(s.days[3]?.status).toBe('unrecorded');
-    expect(s.leaves).toBe(6);
-    expect(s.litter).toBe(0);
-    expect(s.weeks[0]?.balanced).toBe(true);
-    expect(s.status).toBe('healthy');
+    expect(s.weeks[0]).toMatchObject({ balanced: false, missedDays: 1, fallen: 6 });
+    expect(s.litter).toBe(6);
+    expect(s.status).toBe('slowed');
+  });
+
+  it('an unrecorded day can still be compensated within the week', () => {
+    const r = new Records().days_(addDays(MON, 1), 3).comp(addDays(MON, 3)); // Monday never entered
+    const s = state(r, at(addDays(MON, 3), 22));
+    expect(s.days[0]?.status).toBe('compensated');
+    expect(s.openUnits).toBe(0);
+    const open = state(new Records().days_(addDays(MON, 1), 3), at(addDays(MON, 3), 22));
+    expect(open.days[0]?.status).toBe('unrecorded');
+    expect(open.openUnits).toBe(1);
+  });
+
+  it('a week without any check-in is unbalanced', () => {
+    const s = state(new Records(), at(week(1), 10));
+    expect(s.weeks[0]).toMatchObject({ balanced: false, missedDays: 7 });
+    expect(s.status).toBe('slowed');
   });
 
   it('canRecord: up to 2 days back, current week only, never in the future', () => {
     const wed = addDays(MON, 2);
-    expect(canRecord(wed, wed)).toBe(true);
-    expect(canRecord(MON, wed)).toBe(true);
-    expect(canRecord(addDays(MON, 3), wed)).toBe(false);
-    expect(canRecord(MON, addDays(MON, 3))).toBe(false);
-    // Sunday cannot be backfilled on Monday: the week is settled.
-    expect(canRecord(addDays(MON, 6), week(1))).toBe(false);
+    expect(canRecord(wed, at(wed, 22))).toBe(true);
+    expect(canRecord(MON, at(wed, 22))).toBe(true);
+    expect(canRecord(MON, at(addDays(MON, 3), 2))).toBe(true); // Thursday 02:00 is still Wednesday
+    expect(canRecord(addDays(MON, 3), at(wed, 22))).toBe(false);
+    expect(canRecord(MON, at(addDays(MON, 3), 10))).toBe(false);
+    const sun = addDays(MON, 6);
+    expect(canRecord(sun, at(sun, 23, 59))).toBe(true);
+    // From Monday 00:00 the old week is over, although the day only changes at 03:00.
+    expect(canRecord(sun, at(week(1), 0, 0))).toBe(false);
+    expect(canRecord(addDays(MON, 5), at(week(1), 1, 0))).toBe(false);
   });
 
   it('records outside the habit window or of another habit are ignored', () => {
@@ -135,7 +163,7 @@ describe('forgotten check-ins (Plan.md 2.3.4)', () => {
       .comp(MON, 'other')
       .srbaiAnswer(MON, [7, 7, 7, 7], undefined, 'other');
     const s = state(r, at(MON, 22));
-    expect(s.leaves).toBe(0);
+    expect(s.leaves).toBe(START);
     expect(s.latestSrbaiScore).toBeUndefined();
   });
 });
@@ -143,26 +171,29 @@ describe('forgotten check-ins (Plan.md 2.3.4)', () => {
 describe('week boundary and day cutoff', () => {
   const r = () => new Records().days_(MON, 6).day(addDays(MON, 6), 'no');
 
-  it('Monday 02:30 is still Sunday: week not settled, compensation still possible', () => {
-    const s = state(r(), at(week(1), 2, 30));
-    expect(s.today).toBe(addDays(MON, 6));
+  it('Sunday 23:59: week still open, compensation still counts', () => {
+    const s = state(r(), at(addDays(MON, 6), 23, 59));
     expect(s.weeks[0]?.settled).toBe(false);
     expect(s.openUnits).toBe(1);
-    expect(s.leaves).toBe(6);
+    expect(s.leaves).toBe(START + 6);
+    expect(state(r().comp(addDays(MON, 6)), at(week(1), 10)).weeks[0]?.balanced).toBe(true);
   });
 
-  it('compensation entered Monday 02:30 counts for the Sunday', () => {
-    const rec = r().comp(addDays(MON, 6));
-    const s = state(rec, at(week(1), 3, 0));
-    expect(s.weeks[0]?.balanced).toBe(true);
-    expect(s.leaves).toBe(6 + 1);
-  });
-
-  it('Monday 03:00 settles the week', () => {
-    const s = state(r(), at(week(1), 3, 0));
+  it('Monday 00:00 settles the week, although the day is still Sunday until 03:00', () => {
+    const s = state(r(), at(week(1), 0, 0));
+    expect(s.today).toBe(addDays(MON, 6));
+    expect(s.weeks).toHaveLength(1);
     expect(s.weeks[0]).toMatchObject({ settled: true, balanced: false, fallen: 6 });
-    expect(s.leaves).toBe(0);
+    expect(s.leaves).toBe(START);
     expect(s.litter).toBe(6);
+    expect(s.openUnits).toBe(0);
+    expect(s.days[6]?.status).toBe('missed');
+  });
+
+  it('Monday 00:30 without Sunday check-in: Sunday counts as missed, not pending', () => {
+    const s = state(new Records().days_(MON, 6), at(week(1), 0, 30));
+    expect(s.days[6]?.status).toBe('unrecorded');
+    expect(s.weeks[0]?.balanced).toBe(false);
   });
 
   it('Sunday 02:30 still belongs to Saturday', () => {
@@ -187,7 +218,7 @@ describe('week level (Plan.md 2.4)', () => {
     const r = balanced(new Records(), 0);
     unbalanced(r, 1);
     const s = state(r, at(week(2), 10));
-    expect(s.leaves).toBe(7);
+    expect(s.leaves).toBe(START + 7);
     expect(s.litter).toBe(6);
     expect(s.status).toBe('slowed');
     expect(s.openUnits).toBe(0);
@@ -195,7 +226,7 @@ describe('week level (Plan.md 2.4)', () => {
       { kind: 'fall', day: addDays(week(1), 6), count: 6 },
       { kind: 'status', day: addDays(week(1), 6), from: 'healthy', to: 'slowed' },
     ]);
-    expect(s.grownTotal).toBe(13); // structure keeps fallen growth
+    expect(s.grownTotal).toBe(START + 13); // structure keeps fallen growth
   });
 
   it('unbalanced week without any leaves: no fall event', () => {
@@ -212,7 +243,7 @@ describe('week level (Plan.md 2.4)', () => {
     r.days_(week(2), 3);
     const s = state(r, at(addDays(week(2), 2), 22));
     expect(s.status).toBe('stagnating');
-    expect(s.leaves).toBe(0);
+    expect(s.leaves).toBe(START);
     expect(s.buds).toBe(3);
     expect(s.vitality).toBe(1);
   });
@@ -223,19 +254,23 @@ describe('week level (Plan.md 2.4)', () => {
     unbalanced(r, 1);
     balanced(r, 2);
     const s = state(r, at(week(3), 10));
-    expect(s.leaves).toBe(7);
+    expect(s.leaves).toBe(START + 7);
     expect(s.buds).toBe(0);
     expect(s.status).toBe('slowed');
   });
 
-  it('assumption A-3: buds of an unbalanced stagnating week fall as litter', () => {
+  it('buds of an unbalanced week do not fall — only wilted leaves become litter (2026-11-10)', () => {
     const r = new Records();
     unbalanced(r, 0);
     unbalanced(r, 1);
     unbalanced(r, 2);
     const s = state(r, at(week(3), 10));
-    expect(s.litter).toBe(18);
-    expect(s.leaves).toBe(0);
+    expect(s.litter).toBe(12);
+    expect(s.leaves).toBe(START);
+    expect(s.buds).toBe(0);
+    expect(s.weeks[2]).toMatchObject({ grown: 6, fallen: 0, budsExpired: 6 });
+    expect(s.grownTotal).toBe(START + 12); // expired buds never were leaves
+    expect(s.events.filter((e) => e.kind === 'fall')).toHaveLength(2);
   });
 
   it('3 unbalanced weeks in a row: wilting with lower vitality; it does not go further down', () => {
@@ -264,12 +299,12 @@ describe('week level (Plan.md 2.4)', () => {
     expect(state(r, at(week(2), 10)).events).toEqual([]);
   });
 
-  it('assumption: a week without any check-in counts as balanced', () => {
+  it('a week without any check-in lowers the status further', () => {
     const r = new Records();
     unbalanced(r, 0);
     const s = state(r, at(week(2), 10));
-    expect(s.weeks[1]?.balanced).toBe(true);
-    expect(s.status).toBe('healthy');
+    expect(s.weeks[1]?.balanced).toBe(false);
+    expect(s.status).toBe('stagnating');
   });
 });
 
@@ -308,9 +343,9 @@ describe('wind (Plan.md 2.5)', () => {
 describe('completion (Plan.md 2.6)', () => {
   const sixWeeks = () => new Records().days_(MON, 42);
 
-  it('all conditions met: ready', () => {
-    const r = sixWeeks().srbaiAnswer(addDays(MON, 41), [5, 6, 5, 6]);
-    const s = state(r, at(week(6), 10));
+  it('all conditions met: ready (the start leaf counts)', () => {
+    const r = new Records().days_(MON, 41).srbaiAnswer(addDays(MON, 40), [5, 6, 5, 6]);
+    const s = state(r, at(addDays(MON, 41), 22)); // Sunday of week 5, not yet checked in
     expect(s.leaves).toBe(PARAMS.MIN_LEAVES);
     expect(s.latestSrbaiScore).toBe(5.5);
     expect(s.completion).toEqual({ ready: true, enoughLeaves: true, automaticEnough: true, groundClear: true, healthy: true });
@@ -341,9 +376,9 @@ describe('completion (Plan.md 2.6)', () => {
 
   it('SRBAI is due weekly from 35 leaves on', () => {
     const r = new Records().days_(MON, 35);
-    expect(state(r, at(addDays(MON, 33), 22)).srbaiDue).toBe(false);
-    expect(state(r, at(addDays(MON, 34), 22)).srbaiDue).toBe(true);
-    r.srbaiAnswer(addDays(MON, 34), [4, 4, 4, 4]);
+    expect(state(r, at(addDays(MON, 32), 22)).srbaiDue).toBe(false);
+    expect(state(r, at(addDays(MON, 33), 22)).srbaiDue).toBe(true);
+    r.srbaiAnswer(addDays(MON, 33), [4, 4, 4, 4]);
     expect(state(r, at(addDays(MON, 34), 22)).srbaiDue).toBe(false);
     r.days_(week(5), 1);
     expect(state(r, at(week(5), 22)).srbaiDue).toBe(true); // new week
@@ -360,7 +395,8 @@ describe('lifecycle', () => {
     const h = habit({ ended: { day: addDays(MON, 2), reason: 'dormant', at: '' } });
     const s = state(new Records().days_(MON, 7), at(week(5), 10), h);
     expect(s.today).toBe(addDays(MON, 2));
-    expect(s.leaves).toBe(3);
+    expect(s.leaves).toBe(START + 3);
+    expect(s.weeks[0]?.settled).toBe(false);
   });
 
   it('an end day in the future does not shift today', () => {

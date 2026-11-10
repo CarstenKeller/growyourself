@@ -13,3 +13,4 @@ App (`/da`) und wird nie überschrieben.
 ## Einzeln übernommen (/d+)
 
 <!-- Datum – Eintrag(e) – Commit in context-plus-skills -->
+- 2026-11-10 – SKILL.md, „Rangfolge der Quellen“: neue Stufe 4 (Designvorgaben in mitgegebenen Projektdateien unterhalb von Register und A-xx) – `8d81f53` (Vorgabe ohne Kommando, wie `/d+` behandelt)

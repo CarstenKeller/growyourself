@@ -54,8 +54,9 @@ tests/          # Szenario-Tests der Regel-Engine
 - Wochenabrechnung passiert beim Öffnen der App (kein Hintergrundprozess vorhanden).
 
 ## Konventionen
-- UI-Texte auf **Deutsch**, Code und Bezeichner auf Englisch.
-- Alle Zahlenwerte (42 Blätter, 7 Tage Wind, Tagesgrenze 03:00 …) ausschließlich in `params.ts`.
+- UI-Texte auf **Deutsch (Standard) und Englisch** (Designentscheidung D-06), zentral in `src/ui/texts.ts`; Code und Bezeichner auf Englisch.
+- **Designvorgaben aus `context-plus-skills`** (App-Design-Skill `.claude/skills/design-growyourself/`) gehen den Vorgaben in dieser Datei und in Plan.md vor (Vorgabe 2026-11-10).
+- Alle Zahlenwerte (42 Blätter, 7 Tage Wind, Tagesgrenze 03:00, Wochenende Montag 00:00 …) ausschließlich in `params.ts`.
 - Jede Regeländerung braucht zuerst einen fehlschlagenden Szenario-Test.
 - Datenschema versioniert; jede Änderung mit Migration.
 - Barrierearm: Tastaturbedienung, ausreichende Kontraste, Baumzustand auch als Text (Screenreader).

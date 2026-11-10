@@ -34,15 +34,28 @@ export function isSuccess(habit: Habit, entry: DayEntry): boolean {
   return entry.result === 'yes';
 }
 
-/**
- * May a check-in (or compensation) for `day` still be entered on `today`?
- * Plan.md 2.3.4: up to CHECKIN_BACKFILL_DAYS back, only within weeks not yet
- * settled — that is the current week, because a week is settled as soon as it
- * has ended. Future days are not allowed.
- */
-export function canRecord(day: DayKey, today: DayKey): boolean {
+/** Day used for the week boundary: the old week is over from Monday WEEK_CUTOFF (00:00). */
+function weekClockDay(now: Date): DayKey {
+  return dayKeyOf(now, PARAMS.WEEK_CUTOFF_HOUR, PARAMS.WEEK_CUTOFF_MINUTE);
+}
+
+/** Has the week of `day` ended, measured by the week clock? */
+function weekOver(day: DayKey, clockDay: DayKey): boolean {
+  return weekEnd(day) < clockDay;
+}
+
+function recordable(day: DayKey, today: DayKey, clockDay: DayKey): boolean {
   const diff = daysBetween(day, today);
-  return diff >= 0 && diff <= PARAMS.CHECKIN_BACKFILL_DAYS && weekStart(day) === weekStart(today);
+  return diff >= 0 && diff <= PARAMS.CHECKIN_BACKFILL_DAYS && !weekOver(day, clockDay);
+}
+
+/**
+ * May a check-in (or compensation) for `day` still be entered at `now`?
+ * Plan.md 2.3.4: up to CHECKIN_BACKFILL_DAYS back, only while the day's week
+ * is not over (Monday 00:00). Future days are not allowed.
+ */
+export function canRecord(day: DayKey, now: Date): boolean {
+  return recordable(day, dayKeyOf(now), weekClockDay(now));
 }
 
 function statusOf(level: number): TreeStatus {
@@ -52,7 +65,9 @@ function statusOf(level: number): TreeStatus {
 export function computeTreeState(habit: Habit, records: HabitRecords, now: Date): TreeState {
   const nowDay = dayKeyOf(now);
   // An archived tree is frozen on the day it ended.
-  const today = habit.ended && habit.ended.day < nowDay ? habit.ended.day : nowDay;
+  const frozen = habit.ended !== undefined && habit.ended.day < nowDay;
+  const today = frozen ? (habit.ended as { day: DayKey }).day : nowDay;
+  const clockDay = frozen ? today : weekClockDay(now);
   const inRange = (r: { habitId: string; day: DayKey }): boolean =>
     r.habitId === habit.id && r.day >= habit.startDay && r.day <= today;
 
@@ -63,11 +78,12 @@ export function computeTreeState(habit: Habit, records: HabitRecords, now: Date)
     .map((c) => c.day)
     .sort();
 
+  const started = habit.startDay <= today;
   let level = 0;
-  let leaves = 0;
+  let leaves = started ? PARAMS.START_LEAVES : 0;
   let buds = 0;
   let litter = 0;
-  let grownTotal = 0;
+  let grownTotal = leaves;
   let streak = 0;
   let openUnits = 0;
   const days: DayInfo[] = [];
@@ -75,7 +91,7 @@ export function computeTreeState(habit: Habit, records: HabitRecords, now: Date)
   const events: TreeEvent[] = [];
 
   const lastWeek = weekStart(today);
-  for (let ws = weekStart(habit.startDay); ws <= lastWeek && habit.startDay <= today; ws = addDays(ws, 7)) {
+  for (let ws = weekStart(habit.startDay); ws <= lastWeek && started; ws = addDays(ws, 7)) {
     const we = weekEnd(ws);
     const weekDays = dayRange(ws < habit.startDay ? habit.startDay : ws, we < today ? we : today);
 
@@ -84,20 +100,21 @@ export function computeTreeState(habit: Habit, records: HabitRecords, now: Date)
     const missed: DayKey[] = [];
     for (const day of weekDays) {
       const entry = entries.get(day);
-      if (entry) {
-        const s: DayStatus = isSuccess(habit, entry) ? 'success' : 'missed';
-        status.set(day, s);
-        if (s === 'missed') missed.push(day);
+      if (entry && isSuccess(habit, entry)) {
+        status.set(day, 'success');
+      } else if (!entry && recordable(day, today, clockDay)) {
+        status.set(day, 'pending');
       } else {
-        // Assumption A-1: a check-in that can no longer be backfilled is neutral
-        // (no leaf, no compensation unit) — forgetting is not failing (CLAUDE.md 4).
-        status.set(day, canRecord(day, today) ? 'pending' : 'unrecorded');
+        // A check-in not backfilled in time counts as missed ("Urlaub gibt es nicht", 2026-11-10).
+        // Forgetting is covered by the backfill window (CLAUDE.md 4) and can be compensated.
+        status.set(day, entry ? 'missed' : 'unrecorded');
+        missed.push(day);
       }
     }
 
     // 2. Compensation units make good missed days of the same week (Plan.md 2.3.3).
-    // Assumption A-2: a unit covers only missed days up to the day it was done,
-    // earliest first; surplus units carry no credit.
+    // A unit covers only missed days up to the day it was done ("Vorarbeiten zählt
+    // nicht", 2026-11-10), earliest first; surplus units carry no credit.
     let covered = 0;
     for (const cDay of compensationDays) {
       if (weekStart(cDay) !== ws) continue;
@@ -130,20 +147,27 @@ export function computeTreeState(habit: Habit, records: HabitRecords, now: Date)
 
     const grown = successDays + covered;
     const open = missed.length - covered;
-    grownTotal += grown;
     const statusDuring = statusOf(level);
-    const settled = we < today;
+    const budMode = level >= BUD_LEVEL;
+    const settled = weekOver(ws, clockDay);
     let fallen = 0;
+    let budsExpired = 0;
 
     if (settled) {
       if (open === 0) {
         leaves += grown; // buds of a stagnating week open now
+        grownTotal += grown;
         level = Math.max(0, level - PARAMS.RECOVERY_STEP);
       } else {
-        // Plan.md 2.4: all leaves of this week fall; open units expire.
-        // Assumption A-3: buds of an unbalanced week fall as litter, too.
-        fallen = grown;
-        litter += grown;
+        // Plan.md 2.4: all leaves of this week wilt and fall; open units expire.
+        // Buds do not fall — only wilted leaves become litter (2026-11-10).
+        if (budMode) {
+          budsExpired = grown;
+        } else {
+          fallen = grown;
+          grownTotal += grown;
+          litter += grown;
+        }
         level = Math.min(MAX_LEVEL, level + 1);
         if (fallen > 0) events.push({ kind: 'fall', day: we, count: fallen });
       }
@@ -152,8 +176,12 @@ export function computeTreeState(habit: Habit, records: HabitRecords, now: Date)
       }
     } else {
       openUnits = open;
-      if (level >= BUD_LEVEL) buds = grown;
-      else leaves += grown;
+      if (budMode) {
+        buds = grown;
+      } else {
+        leaves += grown;
+        grownTotal += grown;
+      }
     }
 
     weeks.push({
@@ -167,6 +195,7 @@ export function computeTreeState(habit: Habit, records: HabitRecords, now: Date)
       missedDays: open,
       grown,
       fallen,
+      budsExpired,
       ...(windDay ? { windDay } : {}),
     });
   }

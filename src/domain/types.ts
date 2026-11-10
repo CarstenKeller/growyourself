@@ -96,9 +96,9 @@ export interface HabitRecords {
 export type TreeStatus = 'healthy' | 'slowed' | 'stagnating' | 'wilting';
 
 /**
- * success: criterion met. compensated: missed, but made good within the week.
+ * success: criterion met. compensated: missed or unrecorded, but made good within the week.
  * missed: criterion not met, not (yet) compensated. pending: no check-in yet,
- * can still be entered. unrecorded: no check-in and too late to backfill (neutral).
+ * can still be entered. unrecorded: no check-in and too late to backfill — counts as missed.
  */
 export type DayStatus = 'success' | 'compensated' | 'missed' | 'pending' | 'unrecorded';
 
@@ -125,6 +125,8 @@ export interface WeekSummary {
   grown: number;
   /** Leaves that fell to the ground at the end of the week. */
   fallen: number;
+  /** Buds of an unbalanced week: they do not open and do not fall, they are gone. */
+  budsExpired: number;
   /** Day on which the wind cleared the ground in this week, if any. */
   windDay?: DayKey;
 }
@@ -154,7 +156,7 @@ export interface TreeState {
   buds: number;
   /** Fallen leaves on the ground. */
   litter: number;
-  /** All leaves and buds ever grown: drives the branch structure, never shrinks. */
+  /** All leaves ever on the tree (incl. fallen ones): drives the branch structure, never shrinks. */
   grownTotal: number;
   /** 0..1, visible vitality. */
   vitality: number;

@@ -7,6 +7,17 @@ export const PARAMS = {
   DAY_CUTOFF_HOUR: 3,
   DAY_CUTOFF_MINUTE: 0,
 
+  /**
+   * The old ISO week is over from Monday at this local time (confirmed 2026-11-10:
+   * "Mit Montag 00:01 Uhr ist die alte Woche um"). Independent of DAY_CUTOFF:
+   * Monday 01:00 still belongs to Sunday as a day, but Sunday's week is closed.
+   */
+  WEEK_CUTOFF_HOUR: 0,
+  WEEK_CUTOFF_MINUTE: 0,
+
+  /** Leaves granted for starting the habit — the first step of becoming active (2026-11-10). Never fall. */
+  START_LEAVES: 1,
+
   /** A forgotten check-in can be backfilled this many days back (only within the current, unsettled week). */
   CHECKIN_BACKFILL_DAYS: 2,
 

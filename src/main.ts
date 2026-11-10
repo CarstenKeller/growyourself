@@ -1,5 +1,10 @@
 import './ui/style.css';
-import { texts } from './ui/texts';
+import { TEXTS, pickLang } from './ui/texts';
+
+const lang = pickLang(navigator.languages);
+const texts = TEXTS[lang];
+document.documentElement.lang = lang;
+document.title = texts.appName;
 
 // Phase 0: empty, installable shell. Screens follow in Phase 3+.
 const app = document.querySelector<HTMLElement>('#app');

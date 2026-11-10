@@ -29,12 +29,12 @@ ist das zentrale Bild; Texte ermutigen, ohne Wirksamkeit zu versprechen.
 - **Status:** abgeleitet
 
 ### A-02: UI-Sprache
-- **Entscheidung:** UI-Texte auf Deutsch, zentral in `src/ui/texts.ts`.
-- **Abweichung von:** D-06 (Deutsch + Englisch) – **Widerspruch offen**, siehe Plan.md Abschnitt 5. Bis zur Klärung nur Deutsch, Texte aber so gebündelt, dass Englisch nachrüstbar ist.
-- **Quelle:** CLAUDE.md ("UI-Texte auf Deutsch"), 2026-11-10
-- **Status:** abgeleitet – Rückfrage offen
+- **Entscheidung:** ~~UI-Texte nur auf Deutsch.~~ Es gilt D-06 (Deutsch Standard + Englisch).
+- **Umsetzung (Web):** `src/ui/texts.ts` mit `de`/`en`; Sprache aus `navigator.languages`, Deutsch, wenn Englisch nicht vor Deutsch bevorzugt wird. Kein eigener Umschalter (wie D-06). Englischer App-Name „Habit Tree“ ist eine Übersetzung von Claude, nicht vorgegeben.
+- **Quelle:** wörtliche Vorgabe: "Deutsch und Englisch. Alle Designvorgaben aus dem Repo schlagen die Vorgaben der angefügten Dateien.", 2026-11-10
+- **Status:** ersetzt durch D-06 (2026-11-10)
 
 ## Offene Designfragen dieser App
 
-- [ ] Englisch zusätzlich (D-06) oder nur Deutsch (A-02)?
+- [x] ~~Englisch zusätzlich (D-06) oder nur Deutsch (A-02)?~~ → D-06 (2026-11-10)
 - [ ] App-Icon: derzeit Platzhalter; mit dem Baum aus Phase 5 ersetzen?

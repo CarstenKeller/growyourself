@@ -21,7 +21,7 @@
 | Tageskriterium | Was ein erfolgreicher Tag ist (z. B. ≥ 8.000 Schritte; 5 Min. Tagesplanung; kein Doom-Scrolling nach 21 Uhr) |
 | Ausgleichshandlung | Pro Gewohnheit festgelegt, stärkt das Zielverhalten (z. B. 1 km extra gehen; 15 Min. lesen) |
 | Tag | Kalendertag mit Tagesgrenze `DAY_CUTOFF` (Standard 03:00 lokale Zeit) |
-| Woche | ISO-Woche, Montag–Sonntag |
+| Woche | ISO-Woche, Montag–Sonntag. Die alte Woche ist ab Montag 00:00 (`WEEK_CUTOFF`) vorbei – unabhängig von der Tagesgrenze 03:00 (entschieden 2026-11-10) |
 
 ### 2.2 Gewohnheitstypen
 - **menge:** Tageskriterium ist ein Zahlenwert. Ausgleich = festgelegte Extra-Menge.
@@ -30,10 +30,12 @@
 Für alle Typen gilt dieselbe Mechanik: Jeder verpasste Tag erzeugt **eine offene Ausgleichseinheit**.
 
 ### 2.3 Tagesebene
+0. Anlegen der Gewohnheit → **erstes Blatt** (`START_LEAVES` = 1) für den ersten wichtigen Schritt, mit der App aktiv zu werden. Es zählt zum Blattzähler und fällt nie (entschieden 2026-11-10; Details siehe Offene Fragen 16).
 1. Tag erfolgreich → **+1 Blatt**.
 2. Tag verpasst → kein Blatt, 1 offene Ausgleichseinheit.
-3. Ausgleichseinheit erledigt (bis Sonntag derselben Woche) → verpasster Tag wird nachträglich zum Blatt.
+3. Ausgleichseinheit erledigt (bis Sonntag derselben Woche) → verpasster Tag wird nachträglich zum Blatt. Sie gilt nur für verpasste Tage am selben Tag oder davor – **Vorarbeiten zählt nicht** (2026-11-10); überzählige Einheiten verfallen.
 4. Check-in vergessen → Nachtrag bis `CHECKIN_BACKFILL_DAYS` (Standard 2) Tage zurück möglich, nur innerhalb noch nicht abgerechneter Wochen. Vergessen kostet kein Blatt.
+5. Check-in nicht rechtzeitig nachgetragen → zählt **wie ein verpasster Tag** (offene Ausgleichseinheit, ausgleichbar bis Sonntag). „Urlaub gibt es nicht“: Auch eine Woche ganz ohne Einträge ist unausgeglichen (2026-11-10).
 
 ### 2.4 Wochenebene (Abrechnung beim ersten App-Öffnen nach Sonntag)
 - **Ausgeglichene Woche:** Keine offenen Ausgleichseinheiten.
@@ -41,7 +43,7 @@ Für alle Typen gilt dieselbe Mechanik: Jeder verpasste Tag erzeugt **eine offen
 - **Status-Stufen** (pro unausgeglichener Woche in Folge eine Stufe abwärts):
   1. `gesund` – normales Wachstum
   2. `gebremst` – nach 1 unausgeglichenen Woche (Blätter fallen wie oben)
-  3. `stagnierend` – nach 2 in Folge: erfolgreiche Tage erzeugen nur **Knospen**; sie öffnen sich zu Blättern, wenn die Woche ausgeglichen endet
+  3. `stagnierend` – nach 2 in Folge: erfolgreiche Tage erzeugen nur **Knospen**; sie öffnen sich zu Blättern, wenn die Woche ausgeglichen endet. Endet sie unausgeglichen, fallen die Knospen **nicht** als Laub – nur verwelkte Blätter fallen zu Boden; die Knospen vergehen (2026-11-10)
   4. `welkend` – nach 3 in Folge: zusätzlich sinkt die sichtbare Vitalität (Farbe, Haltung)
 - **Erholung:** Jede ausgeglichene Woche hebt den Status um `RECOVERY_STEP` Stufen (Standard 1).
 - Welken kostet **keine** Wachstumsstufen der Baumstruktur, nur Vitalität und die Blätter der betroffenen Wochen.
@@ -138,6 +140,8 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 - [ ] Selbsttest: 2 Wochen Eigennutzung, danach Parameter überprüfen
 
 ## 5. Offene Fragen (vor bzw. während der Umsetzung klären)
+**Stand 2026-11-10:** Antworten des Nutzers sind bei den Punkten vermerkt. ~~Durchgestrichen~~ = erledigt.
+
 1. Sollen bei einer unausgeglichenen Woche wirklich **alle** Blätter dieser Woche fallen, oder nur so viele, wie Tage unausgeglichen blieben? (Aktuell: alle – strenger; Alternative milder.)
 2. Erholung um 1 Stufe pro ausgeglichener Woche (aktuell) oder direkt zurück auf `gebremst`?
 3. SRBAI passt gut zu Aufbau-Gewohnheiten. Für `verzicht` misst es Automatik eines *Nicht-Tuns* nur bedingt – Formulierung anpassen oder anderes Kriterium (z. B. Drang-Stärke 1–10)?
@@ -145,17 +149,18 @@ Nach ≥ 14 Check-ins: häufigste Hinderungsgründe, Verteilung nach Wochentag, 
 5. ~~GitHub Pages aus privatem Repo …~~ → Repo `growyourself` ist öffentlich (Stand 2026-11-10), GitHub Pages ist damit ohne Bezahl-Plan möglich.
 6. Name der App. (Repo heißt `growyourself`; UI zeigt vorerst „Gewohnheitsbaum“.)
 
-**Lücken im Regelwerk, in Phase 1 mit einer Annahme gefüllt** (im Code als „Assumption A-n“ markiert, je durch einen Szenario-Test abgesichert; Änderung = Test anpassen, dann Regel):
+**Lücken im Regelwerk aus Phase 1** (Antworten 2026-11-10, jeweils per Szenario-Test abgesichert):
 
-7. **A-1 – Nie nachgetragener Check-in:** Ein Tag ohne Eintrag, dessen Nachtragsfrist abgelaufen ist, zählt als *neutral* (kein Blatt, keine Ausgleichseinheit, kein Laubfall). Begründung: Leitprinzip 4. Folge: Wer an schlechten Tagen gar nicht eincheckt, umgeht die Konsequenz. Alternative: als verpasst werten.
-8. **Sonntag nachtragen:** „Nur innerhalb noch nicht abgerechneter Wochen“ heißt wörtlich: Ein vergessener Sonntag kann am Montag (ab 03:00) nicht mehr nachgetragen werden, weil die Woche dann abgerechnet ist. Umgesetzt wie geschrieben; zusammen mit A-1 bleibt er neutral. Gewollt?
-9. **A-2 – Zeitpunkt der Ausgleichshandlung:** Eine Einheit gleicht nur verpasste Tage aus, die am selben Tag oder davor liegen (kein „Vorarbeiten“), älteste zuerst. Überzählige Einheiten verfallen ohne Gutschrift.
-10. **A-3 – Knospen bei unausgeglichener Woche:** Im Status `stagnierend`/`welkend` fallen die Knospen einer unausgeglichenen Woche wie Blätter als Laub zu Boden (zählen also für Wind und Abschluss). Alternative: sie verfallen ersatzlos.
-11. **Woche ohne jeden Eintrag** (z. B. Urlaub, App nicht genutzt): zählt als ausgeglichen und hebt damit den Status. Gewollt, oder neutral (Status bleibt)?
+7. ~~Nie nachgetragener Check-in neutral?~~ → **Nein:** zählt wie verpasst (abgeleitet aus „Urlaub gibt es nicht“, siehe 11; Regel 2.3.5). *Interpretation von Claude* – bitte bestätigen.
+8. ~~Sonntag nachtragen?~~ → „Mit Montag 00:01 Uhr ist die alte Woche um.“ Umgesetzt als `WEEK_CUTOFF` Montag 00:00: Ab dann ist weder Nachtrag noch Ausgleich für die alte Woche möglich, obwohl der *Tag* bis 03:00 noch Sonntag ist. Folge zusammen mit 7: Ein vergessener Sonntags-Check-in macht die Woche unausgeglichen. (00:00 statt 00:01 ist *Interpretation*: Sonntag 23:59 gehört noch zur alten Woche.)
+9. ~~Vorarbeiten?~~ → „Verarbeiten zählt nicht“, gelesen als **Vorarbeiten zählt nicht** (Regel 2.3.3).
+10. ~~Knospen bei unausgeglichener Woche?~~ → „Nicht Knospen, sondern verwelktes Laub fällt zu Boden.“ Knospen fallen nicht als Laub; sie öffnen sich auch nicht, sondern vergehen (*Interpretation*: Alternative wäre, dass sie als Knospen bis zur nächsten ausgeglichenen Woche bleiben).
+11. ~~Woche ohne Eintrag?~~ → „Urlaub gibt es nicht.“ Eine solche Woche ist unausgeglichen.
 12. **Wind:** Ausgelöst am 7. grünen Tag in Folge (erfolgreich oder ausgeglichen), weht alles Laub weg, das bis dahin liegt. Ein Tag ohne Eintrag (vor heute) unterbricht die Serie; der heutige, noch offene Tag nicht.
 13. **„Wochenwechsel an Sonntag 02:30“** (Phase-1-Test) verstanden als Nacht von Sonntag auf Montag: Montag 02:30 gehört noch zum Sonntag, die Woche ist noch offen. Zusätzlich getestet: Sonntag 02:30 gehört zum Samstag.
 14. **SRBAI:** Skala (1–7) und Schwelle (5) in `params.ts` sind **Platzhalter**, nicht aus der Quelle geprüft. Gewertet wird die jüngste Antwort (Mittelwert der Items). Vor Phase 7 klären.
-15. **Sprache:** CLAUDE.md sagt „UI-Texte auf Deutsch“, das allgemeine Design-Register (D-06) verlangt Deutsch + Englisch. Bis zur Klärung nur Deutsch, Texte gebündelt in `src/ui/texts.ts`.
+15. ~~Sprache?~~ → **Deutsch und Englisch** (D-06). Grundsatz: Designvorgaben aus dem Repo `context-plus-skills` gehen den Vorgaben dieser Dateien vor (2026-11-10).
+16. **Startblatt** („Checkin startet mit dem ersten Blatt für den ersten wichtigen Schritt mit der Nutzung der App aktiv zu werden“): umgesetzt als 1 Blatt beim Anlegen der Gewohnheit, das zum Mindestwert 42 zählt und nie fällt (auch nicht, wenn die erste Woche unausgeglichen endet). *Interpretation* – offen: Soll es stattdessen erst mit dem ersten Check-in entstehen, und soll es zu den 42 zählen?
 
 ## 6. Fortschritt
 _(Claude Code trägt hier nach jeder Phase eine kurze Notiz ein.)_
@@ -163,3 +168,4 @@ _(Claude Code trägt hier nach jeder Phase eine kurze Notiz ein.)_
 - **2026-11-10 – Phase 0 abgeschlossen:** Build, Lint und Tests in CI grün. Leere PWA lokal in Chromium geprüft: Service Worker aktiv, Manifest ohne Installierbarkeits-Fehler, keine externen Requests. **Offen:** GitHub Pages ist im Repo nicht aktiviert (Deploy-Job: 404 „Ensure GitHub Pages has been enabled“) – einmalig *Settings → Pages → Source: GitHub Actions*. Deployt wird nur der Standard-Branch. Icon ist ein Platzhalter. `npm audit`: 3 mittlere Meldungen in Build-Werkzeugen (workbox-build → glob/minimatch/deepmerge), nicht im ausgelieferten Code; Fix nur per Downgrade von vite-plugin-pwa, daher bewusst belassen.
 - **2026-11-10 – Phase 1 abgeschlossen:** Regel-Engine `computeTreeState(habit, records, now)` als reine Funktion; Kalender mit Tagesgrenze, ISO-Wochen, Sommerzeit-Tests (Europe/Berlin). 50 Tests, `rules.ts` 100 % Zweig-/Zeilenabdeckung (in `vitest.config.ts` als Schwelle erzwungen). Lücken im Regelwerk als Annahmen A-1–A-3 u. a. unter „Offene Fragen“ 7–15.
 - **2026-11-10 – Phase 2 abgeschlossen:** IndexedDB-Schema v1 (`habits`, `days`, `compensations`, `reflections`, `srbai`, `meta`) mit Migrationsliste; Export/Import als JSON mit Format-Kennung, Schemaversion, Validierung (Typen, Datumsformat, Dubletten, Verweise, max. eine aktive Gewohnheit) und Import in einer einzigen Transaktion. Abnahmetest „Export → Löschen → Import ergibt identischen TreeState“ grün (mit `fake-indexeddb`, Dev-Abhängigkeit nur für Tests). Im echten Browser noch nicht geprüft – das folgt mit der UI.
+- **2026-11-10 – Regeländerungen nach Antworten** (Offene Fragen 7–11, 15, 16): Startblatt, Wochenende Montag 00:00, nicht nachgetragene Tage zählen als verpasst, Knospen fallen nicht. Zuerst Tests angepasst (26 rot), dann Regeln; 65 Regel-/Kalendertests grün, `rules.ts` 100 % Zweigabdeckung. UI-Texte zweisprachig (`src/ui/texts.ts`, Sprache aus Browser-Einstellung, Standard Deutsch).

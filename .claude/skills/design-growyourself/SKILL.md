@@ -35,7 +35,12 @@ Bei jeder UI-Arbeit in dieser Reihenfolge prüfen — die höhere Quelle gewinnt
    *bestätigt* sind verbindlich; Einträge
    mit Status *abgeleitet* sind Arbeitsannahmen, die verwendet, aber bei
    Gelegenheit beim Nutzer bestätigt werden sollen.
-4. **Plattform-Standard** (Material 3 / Android-Richtlinien), wo keine
+4. **Designvorgaben in Projektdateien, die der Nutzer für die App
+   mitgibt** (z. B. `CLAUDE.md`, `Plan.md`). Sie gelten nur, wo 1–3 nichts
+   festlegen: „Alle Designvorgaben aus dem Repo schlagen die Vorgaben der
+   angefügten Dateien“ (Vorgabe 2026-11-10, growyourself). Widerspruch in
+   der Antwort nennen und die Projektdatei anpassen.
+5. **Plattform-Standard** (Material 3 / Android-Richtlinien), wo keine
    Entscheidung existiert.
 
 Widersprechen sich zwei Quellen, nicht stillschweigend eine wählen,
